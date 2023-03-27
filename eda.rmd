@@ -1,0 +1,22 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+```
+
+```{r}
+# Load the data
+data <- read.csv("final_data_with_flood_risk.csv")
+data
+```
+
+```{r}
+# Create a new data frame with only the variables we want
+data2 <- data %>% select()
+```
