@@ -1,0 +1,99 @@
+---
+title: "Heywood's Questiions"
+Author: "Heywood  Williams-Tracy"
+output: html_notebook
+---
+
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(gclus)
+
+# Define a function to convert a character column to a float column
+char_to_float <- function(df, col_name) {
+  # Convert the column to a numeric vector
+  float_col <- as.numeric(df[[col_name]])
+
+  # Check for invalid values
+  if (any(is.na(float_col))) {
+    stop("Invalid values found in column.")
+  }
+
+  # Replace the original column with the new float column
+  df[[col_name]] <- float_col
+
+  # Return the modified data frame
+  return(df)
+}
+
+```
+```{r, echo=T}
+# Load the data
+golden_leaf_data <- read.csv("final_data_with_golden_leaf.csv")
+```
+`
+RQ1: What trends exist in the data?
+```{r, echo=T}
+# Find the average amount of funds awarded per town
+average_funds_awarded <- golden_leaf_data %>% group_by(Applicant) %>% summarise(average_funds_awarded = mean(Grant.Award....))
+average_funds_awarded
+```
+
+
+```{r, echo=T}
+
+# Correct the column types
+golden_leaf_data <- char_to_float(golden_leaf_data, "Award.Date")
+golden_leaf_data <- char_to_float(golden_leaf_data, "Application.Date")
+
+# Find the average difference in time between the application and the award
+average_time <- golden_leaf_data %>% group_by(Applicant) %>% summarise(Time.between.application.and.award = "Award.Date" - "Application.Date") %>% summarise(average_time = mean(Time.between.application.and.award))
+```
+
+What variables influence whether an organization receives funding?
+```{r, echo=T}
+golden_leaf_corr <- abs(cor(golden_leaf_data))
+
+colors <- dmat.color(golden_leaf_corr)
+order <- order.single(golden_leaf_corr
+
+cpairs(data,                    # Data frame of variables
+       order,                   # Order of the variables
+       panel.colors = colors,   # Matrix of panel colors
+       border.color = "grey70", # Borders color
+       gap = 0.45,              # Distance between subplots
+       main = "Ordered variables colored by correlation", # Main title
+       show.points = TRUE,      # If FALSE, removes all the points
+       pch = 21,                # pch symbol
+       bg = rainbow(3)[iris$Species]) # Colors by group
+
+```
+
+To what extent is there equitable distribution of funds?
+```{r, echo=T}
+
+```
+How does flood risk correlate with the amount of funds received if any?
+```{r, echo=T}
+
+```
+RQ3: Is there a correlation between race/socioeconomic status and applying for funding?
+```{r, echo=T}
+
+```
+RQ4: What is the average amount of funds awarded if any?
+```{r, echo=T}
+
+```
+
+RQ5: What distribution does the amount of funds awarded follow if any?
+```{r, echo=T}
+
+```
+
+RQ6: Is there a correlation between the size of the town and the amount of funds awarded?
+```{r, echo=T}
+
+```
