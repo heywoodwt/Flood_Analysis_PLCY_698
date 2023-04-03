@@ -1,99 +1,92 @@
 ---
-title: "Heywood's Questiions"
+title: "Heywood's Questions"
 Author: "Heywood  Williams-Tracy"
 output: html_notebook
 ---
 
-```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(gclus)
-
-# Define a function to convert a character column to a float column
-char_to_float <- function(df, col_name) {
-  # Convert the column to a numeric vector
-  float_col <- as.numeric(df[[col_name]])
-
-  # Check for invalid values
-  if (any(is.na(float_col))) {
-    stop("Invalid values found in column.")
-  }
-
-  # Replace the original column with the new float column
-  df[[col_name]] <- float_col
-
-  # Return the modified data frame
-  return(df)
-}
-
+library(gganimate)
+library(ggpubr)
+library(vctrs)
+library(corrplot)
+library(reshape2)
+library(ggheatmap)
+library(PerformanceAnalytics)
 ```
-```{r, echo=T}
+
+
+```{r, echo=F}
 # Load the data
 golden_leaf_data <- read.csv("final_data_with_golden_leaf.csv")
 ```
 `
-RQ1: What trends exist in the data?
-```{r, echo=T}
+#### RQ1: What trends exist in the data?
+```{r, echo=F}
 # Find the average amount of funds awarded per town
 average_funds_awarded <- golden_leaf_data %>% group_by(Applicant) %>% summarise(average_funds_awarded = mean(Grant.Award....))
 average_funds_awarded
 ```
+```{r, echo=F}
+correlation_variables <- cor(golden_leaf_data[c("Total.Population", "Living.in.Poverty", "Median.Household.Income..In.2020.Inflation.Adjusted.Dollars.")])
 
+corrplot(correlation_variables, method = "circle")
+```
 
-```{r, echo=T}
-
+```{r, echo=F}
 # Correct the column types
-golden_leaf_data <- char_to_float(golden_leaf_data, "Award.Date")
-golden_leaf_data <- char_to_float(golden_leaf_data, "Application.Date")
+#golden_leaf_data <- char_to_float(golden_leaf_data, "Award.Date")
+#golden_leaf_data <- char_to_float(golden_leaf_data, "Application.Date")
 
 # Find the average difference in time between the application and the award
-average_time <- golden_leaf_data %>% group_by(Applicant) %>% summarise(Time.between.application.and.award = "Award.Date" - "Application.Date") %>% summarise(average_time = mean(Time.between.application.and.award))
+#average_time <- golden_leaf_data %>% group_by(Applicant) %>% summarise(Time.between.application.and.award = "Award.Date" - "Application.Date") %>% summarise(average_time = mean(Time.between.application.and.award))
 ```
 
-What variables influence whether an organization receives funding?
-```{r, echo=T}
-golden_leaf_corr <- abs(cor(golden_leaf_data))
+#### What variables influence whether an organization receives funding?
+```{r, echo=F}
+# Remove rows with missing values in Grant Award column
+simplified_data <- golden_leaf_data[complete.cases(golden_leaf_data$Grant.Award....),]
 
-colors <- dmat.color(golden_leaf_corr)
-order <- order.single(golden_leaf_corr
+cor_data = simplified_data[c("Total.Population", "Living.in.Poverty", "Median.Household.Income..In.2020.Inflation.Adjusted.Dollars.", "Grant.Award....")]
 
-cpairs(data,                    # Data frame of variables
-       order,                   # Order of the variables
-       panel.colors = colors,   # Matrix of panel colors
-       border.color = "grey70", # Borders color
-       gap = 0.45,              # Distance between subplots
-       main = "Ordered variables colored by correlation", # Main title
-       show.points = TRUE,      # If FALSE, removes all the points
-       pch = 21,                # pch symbol
-       bg = rainbow(3)[iris$Species]) # Colors by group
+#head(cor_data)
 
+chart.Correlation(cor_data, histogram=TRUE, method = "pearson")
 ```
 
-To what extent is there equitable distribution of funds?
+
+#### To what extent is there equitable distribution of funds?
 ```{r, echo=T}
+# Find the average amount of funds awarded per race
 
 ```
-How does flood risk correlate with the amount of funds received if any?
+#### How does flood risk correlate with the amount of funds received if any?
 ```{r, echo=T}
-
+cor(simplified_data$Grant.Award...., simplified_data$Total.Percent.of.Land.at.Some.Level.of.Flood.Risk)
 ```
-RQ3: Is there a correlation between race/socioeconomic status and applying for funding?
+#### RQ3: Is there a correlation between race/socioeconomic status and applying for funding?
 ```{r, echo=T}
-
+cor(simplified_data$Grant.Award...., simplified_data$White.Alone..Not.Hispanic.or.Latino.Homeowners.)
 ```
-RQ4: What is the average amount of funds awarded if any?
+#### RQ4: What is the average amount of funds awarded if any?
 ```{r, echo=T}
-
-```
-
-RQ5: What distribution does the amount of funds awarded follow if any?
-```{r, echo=T}
-
+mean_funding = mean(simplified_data$Grant.Award....)
+cat("The average amount of funds awarded is", mean_funding)
 ```
 
-RQ6: Is there a correlation between the size of the town and the amount of funds awarded?
+#### RQ5: What distribution does the amount of funds awarded follow if any?
 ```{r, echo=T}
+ggplot(simplified_data, aes(x = Grant.Award....)) +
+  geom_histogram(binwidth = 0.99, color = "red", fill = "white") + ylim(0, 100) #+ xlim(0, 10000)
+```
 
+#### RQ6: Is there a correlation between the size of the town and the amount of funds awarded?
+```{r, echo=T}
+# Plot of the amount of funds awarded and the population of the town and limit the data to towns with a population of 1000 or less
+ggplot(golden_leaf_data, aes(x = Total.Population, y = Grant.Award....)) + geom_point() + geom_smooth(method = "lm") + xlim(0, 100000)
+```
 ```
