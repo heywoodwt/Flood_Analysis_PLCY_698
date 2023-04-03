@@ -62,8 +62,18 @@ chart.Correlation(cor_data, histogram=TRUE, method = "pearson")
 #### To what extent is there equitable distribution of funds?
 ```{r, echo=T}
 # Find the average amount of funds awarded per race
+white_cor = cor(simplified_data$Grant.Award...., simplified_data$White.Alone)
+african_american_cor = cor(simplified_data$Grant.Award...., simplified_data$Black.or.African.American.Alone)
+native_american_cor = cor(simplified_data$Grant.Award...., simplified_data$American.Indian.and.Alaska.Native.Alone)
+asian_cor = cor(simplified_data$Grant.Award...., simplified_data$Asian.Alone)
+pi_cor = cor(simplified_data$Grant.Award...., simplified_data$Native.Hawaiian.and.Other.Pacific.Islander.Alone)
+other_race_cor = cor(simplified_data$Grant.Award...., simplified_data$Some.Other.Race.Alone)
+two_or_more_cor = cor(simplified_data$Grant.Award...., simplified_data$Two.or.More.Races)
+white_non_hispanic_cor = cor(simplified_data$Grant.Award...., simplified_data$White.Alone..Not.Hispanic.or.Latino.Homeowners.)
 
+cat(white_cor, african_american_cor, native_american_cor, asian_cor, pi_cor, other_race_cor, two_or_more_cor, white_non_hispanic_cor)
 ```
+
 #### How does flood risk correlate with the amount of funds received if any?
 ```{r, echo=T}
 cor(simplified_data$Grant.Award...., simplified_data$Total.Percent.of.Land.at.Some.Level.of.Flood.Risk)
