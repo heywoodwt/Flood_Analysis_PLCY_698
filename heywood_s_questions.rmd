@@ -99,4 +99,7 @@ ggplot(simplified_data, aes(x = Grant.Award....)) +
 # Plot of the amount of funds awarded and the population of the town and limit the data to towns with a population of 1000 or less
 ggplot(golden_leaf_data, aes(x = Total.Population, y = Grant.Award....)) + geom_point() + geom_smooth(method = "lm") + xlim(0, 100000)
 ```
+```{r, echo=T}
+cor_grant_pop = cor(simplified_data$Grant.Award...., simplified_data$Total.Population)
+head(cor_grant_pop)
 ```

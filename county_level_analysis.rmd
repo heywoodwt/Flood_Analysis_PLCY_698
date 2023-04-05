@@ -1,0 +1,66 @@
+---
+title: "County Level Analysis"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(readr)
+```
+
+```{r}
+golden_leaf_data <- read.csv("final_data_with_golden_leaf.csv")
+
+counties_that_have_data <- golden_leaf_data[complete.cases(golden_leaf_data$Grant.Award....),]
+
+counties_that_have_data <- counties_that_have_data %>%
+  mutate(Grant.Award.... = as.numeric(Grant.Award....))
+
+```
+
+```{r}
+# Iterate through each County.Name and create a new data frame with the county name and the correlation between the grant award and the flood risk
+correlations <- data.frame(Geography.Name = character(), Correlation = numeric())
+for (county in unique(counties_that_have_data$Geography.Name)) {
+  county_data <- counties_that_have_data %>%
+    filter(Geography.Name == county)
+  correlation <- cor(county_data$Grant.Award...., county_data$Total.Percent.of.Land.at.Some.Level.of.Flood.Risk)
+  correlations <- rbind(correlations, data.frame(Geography.Name = county, Correlation = correlation))
+}
+```
+
+```{r}
+# Select only the columns county name, grant award, and flood risk
+select_county_data <- counties_that_have_data %>%
+  select(Geography.Name, Grant.Award...., Total.Percent.of.Land.at.Some.Level.of.Flood.Risk)
+
+# Fill in for any missing values in flood risk
+mean_risk <- mean(select_county_data$Total.Percent.of.Land.at.Some.Level.of.Flood.Risk, na.rm = TRUE)
+
+select_county_data$Total.Percent.of.Land.at.Some.Level.of.Flood.Risk[is.na(select_county_data$Total.Percent.of.Land.at.Some.Level.of.Flood.Risk)] <- mean_risk
+```
+
+```{r}
+# Create a new column that is the grant award divided by the flood risk for each county
+select_county_data <- select_county_data %>%
+  mutate(Ratio.Risk = Grant.Award.... / Total.Percent.of.Land.at.Some.Level.of.Flood.Risk)
+
+# Order by lowest ratio to highest ratio
+select_county_data <- select_county_data %>%
+  arrange(Ratio.Risk)
+```
+
+```{r}
+# Save select_county_data to a csv file
+write.csv(select_county_data, "select_county_data.csv")
+```
+
+```{r}
+```
+
+
