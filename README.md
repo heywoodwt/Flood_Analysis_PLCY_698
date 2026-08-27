@@ -23,6 +23,3 @@ Companion to [PLCY_698_Data_Analysis_for_EDF_Spring_2023](https://github.com/hey
 which handles the upstream cleaning, and [PLCY_698_Map_Analysis](https://github.com/heywoodwt/PLCY_698_Map_Analysis),
 which handles the geospatial side.
 
-## License
-
-MIT
